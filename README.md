@@ -12,3 +12,4 @@ Fire Control Unit for AEG
 です。
 
 
+まだ作りかけなのでパクって火を噴いても知りません。
