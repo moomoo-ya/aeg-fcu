@@ -21,50 +21,56 @@
  
  */
 
-// Turn on duration(msec.):
+// Cut off duration(msec.):
 const int DURATION = 55;
-const int PRESS_DURATION = 2000;
+
+// Mag off threashold(0-1024):
+const int MAG_THREASHOLD = 512;
 
 // Set pin number:
 const int TRIGGER_PIN = 6;
 const int GATE_PIN = 10;
+const int MAGAZINE_PIN = 12;
 
 // variables:
-int countDown = 0;
-int triggerTime = 0;
+int cutOffTime = 0;
 int triggerState = LOW;
+int magazineState = 0;
+boolean firing = false;
+boolean magLoaded = false;
 
 void setup() {
+
   pinMode(TRIGGER_PIN, INPUT);
   digitalWrite(TRIGGER_PIN, LOW);
+
+  pinMode(MAGAZINE_PIN, INPUT);
+
   pinMode(GATE_PIN, OUTPUT);
   digitalWrite(GATE_PIN, LOW);
 }
 
 void loop() {
+
+  magazineState = analogRead(MAGAZINE_PIN);
   triggerState = digitalRead(TRIGGER_PIN);
 
-  if (countDown <= 0) {
-    if (triggerState == HIGH) {
-      countDown = DURATION;
-      digitalWrite(GATE_PIN, HIGH);
+  if (magazineState < MAG_THREASHOLD) {
+    digitalWrite(GATE_PIN, triggerState);
+  } else {
+    if (firing) {
+      if (cutOffTime < mills()) {
+        firing = false;
+        digitalWrite(GATE_PIN, LOW);
+      }
     } else {
-      digitalWrite(GATE_PIN, LOW);
+      if (triggerState == HIGH) {
+        cutOffTime = mills() + DURATION;
+        digitalWrite(GATE_PIN, HIGH);
+      }
     }
-  } else {
-    countDown--;
   }
-  
-  if (triggerState == HIGH) {
-    triggerTime++;
-    if (triggerTime > PRESS_DURATION) {
-      
-    }
-  } else {
-    triggerTime = 0;
-  }
-
-  delay(1);
+}
 
 }
 
