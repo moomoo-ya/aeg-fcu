@@ -59,19 +59,16 @@ void loop() {
     digitalWrite(GATE_PIN, triggerState);
   } else {
     if (firing) {
-      if (cutOffTime < mills()) {
+      if (cutOffTime < millis()) {
         firing = false;
         digitalWrite(GATE_PIN, LOW);
       }
     } else {
       if (triggerState == HIGH) {
-        cutOffTime = mills() + DURATION;
+        cutOffTime = millis() + DURATION;
         digitalWrite(GATE_PIN, HIGH);
       }
     }
   }
 }
 
-}
-
-    
