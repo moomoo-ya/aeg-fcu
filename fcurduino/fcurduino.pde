@@ -5,27 +5,25 @@
  
  The circuit:
  * Trigger SW:
-   * ends to +5V(over diode) and digital pin 6(over 100ohm register)
+ * ends to +5V(over diode) and digital pin 6(over 100ohm register)
  * FET:
-   * Gate pin to digital pin 10(over 470ohm register)
-   * Drain pin to motor(-)
-   * Source pin to GND
+ * Gate pin to digital pin 10(over 470ohm register)
+ * Drain pin to motor(-)
+ * Source pin to GND
  * 10K register:
-   * ends to FET Source and FET Gate
+ * ends to FET Source and FET Gate
  * Diode:
-   * Motor(-) -> Motor(+)
-   * +5V -> Triger SW
+ * Motor(-) -> Motor(+)
+ * +5V -> Triger SW
  * 10uF capacitor:
-   * GND -> Trigger SW
- 
- 
+ * GND -> Trigger SW
  */
 
 // Cut off duration(msec.):
 const int DURATION = 55;
 
 // Mag off threashold(0-1024):
-const int MAG_THREASHOLD = 512;
+const int MAG_THREASHOLD = 128;
 
 // Set pin number:
 const int TRIGGER_PIN = 6;
@@ -48,6 +46,9 @@ void setup() {
 
   pinMode(GATE_PIN, OUTPUT);
   digitalWrite(GATE_PIN, LOW);
+
+  // for debug
+  //Serial.begin(9600);
 }
 
 void loop() {
@@ -56,19 +57,33 @@ void loop() {
   triggerState = digitalRead(TRIGGER_PIN);
 
   if (magazineState < MAG_THREASHOLD) {
-    digitalWrite(GATE_PIN, triggerState);
-  } else {
+    firing = false;
+    digitalWrite(GATE_PIN, LOW);
+  } 
+  else {
     if (firing) {
       if (cutOffTime < millis()) {
         firing = false;
         digitalWrite(GATE_PIN, LOW);
       }
-    } else {
+    } 
+    else {
       if (triggerState == HIGH) {
         cutOffTime = millis() + DURATION;
+        firing = true;
         digitalWrite(GATE_PIN, HIGH);
       }
     }
   }
+  /*
+  Serial.print("magSts:");
+  Serial.print(magazineState);
+  Serial.print("/tgrSts:");
+  Serial.print(triggerState);
+  Serial.print("/firing:");
+  Serial.println(firing);
+  delay(1);
+  */
 }
+
 
